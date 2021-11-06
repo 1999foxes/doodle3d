@@ -1,0 +1,86 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: 1px solid red;
+    user-select: none;
+    image-rendering: pixelated;
+}
+
+html, body, #root {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.gameObject {
+    margin: auto;
+}
+
+
+.player {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition-duration: 1s;
+    transition-timing-function: linear;
+}
+.player img {
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes walking {
+    0% {transform: skew(0deg, 0deg);}
+    25% {transform: skew(0deg, 5deg);}
+    50% {transform: skew(0deg, 0deg);}
+    75% {transform: skew(0deg, -5deg);}
+    100% {transform: skew(0deg, 0deg);}
+}
+.walking {
+    animation: walking 0.6s infinite;
+}
+
+
+
+.paint .control {
+    position: absolute;
+    right: 15px;
+    top: -25px;
+    z-index: 100;
+}
+
+.paint .control button {
+    height: 20px;
+    width: 20px;
+    margin: 0 2px;
+    background: transparent;
+    position: relative;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+.paint {
+    left: 50px;
+    top: 50px;
+    height: 200px;
+    width: 200px;
+    position: relative;
+}
+
+.paint canvas {
+    height: 100%;
+    width: 100%;
+    border: 2px dashed black;
+    border-radius: 10px;
+}
+
+.paint input {
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    opacity: 0;
+}
