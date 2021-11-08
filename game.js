@@ -20,18 +20,18 @@ window.gameObjects = gameObjects;
 
 
 // global events
-root.addEventListener('pointermove', (e) => {
+document.body.addEventListener('pointermove', (e) => {
     globals.pointerX = e.clientX;
     globals.pointerY = e.clientY;
 });
 
-root.addEventListener('pointerdown', (e) => {
+document.body.addEventListener('pointerdown', (e) => {
     globals.isPointerDown = true;
     globals.lastPointerDownX = e.clientX;
     globals.lastPointerDownY = e.clientY;
 });
 
-root.addEventListener('pointerup', (e) => {
+document.body.addEventListener('pointerup', (e) => {
     globals.isPointerDown = false;
 });
 
