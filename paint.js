@@ -1,8 +1,8 @@
 import { globals, root, gameObjects, GameObject } from './game.js';
 
 class Paint extends GameObject {
-    constructor(defaultImg, handleExport) {
-        super();
+    constructor({defaultImg, handleExport, x, y}) {
+        super({x, y});
 
         // init variables
         this.handleExport = handleExport || this.saveToFile;
@@ -14,7 +14,6 @@ class Paint extends GameObject {
         this.color = [0, 0, 0, 255];    // rgba black
 
         // init dom element
-        this.domElement = document.createElement('div');
         this.domElement.classList.add('paint');
         this.domElement.innerHTML = `
         <div class="control">
@@ -97,8 +96,6 @@ class Paint extends GameObject {
 
     handleChangePen() {
         this.color = hexToRgba(this.colorButton.value);
-        console.log(this.colorButton.value);
-        console.log(this.color);
     }
 
     handleChangeEraser() {

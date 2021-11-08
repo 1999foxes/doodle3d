@@ -2,67 +2,43 @@ import {root, gameObjects} from './game.js';
 import Player from './player.js';
 import Paint from './paint.js';
 import grid from './grid.js';
+import updateControl from './parallaxControl.js';
 
 
-// import * as THREE from './three.module.js';
-
-// const clock = new THREE.Clock();
-
-// const renderer = new THREE.WebGLRenderer();
-// renderer.setPixelRatio(window.devicePixelRatio);
-// renderer.setSize(window.innerWidth, window.innerHeight);
-// renderer.outputEncoding = THREE.sRGBEncoding;
-// root.appendChild(renderer.domElement);
-
-// const scene = new THREE.Scene();
-// scene.background = new THREE.Color(0x000000);
-// const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 100);
-// // camera.position.set(0, 0, 0);
-
-
-// window.onresize = function () {
-
-//     camera.aspect = window.innerWidth / window.innerHeight;
-//     camera.updateProjectionMatrix();
-
-//     renderer.setSize( window.innerWidth, window.innerHeight );
-
-// };
-
-// let p = new Player();
-// p.setStyle({
-//     left: '100px',
-//     top: '100px',
-// });
-// p.texture.onload = p.promptPaintTexture.bind(p);
-// p = null;
-
-let p = new Player('./player.png');
-// p.setStyle({
-//     transform: 'translateZ(100px) translateX(100px) translateY(100px)',
-// });
+let p = new Player({textureUrl: './player.png', x: 100, y: 200});
 window.p = p;
 
+let paint = new Paint({x: grid.gridX2ClientX(5), y: grid.gridY2ClientY(5)});
 
-// const geometry = new THREE.BoxGeometry();
-// const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-// const cube = new THREE.Mesh( geometry, material );
-// cube.translateZ(-10);
-// cube.translateY(-1);
-// scene.add( cube );
+/*
+handleChangeTexture(url) {
+    if (this.texture !== undefined) {
+        this.domElement.removeChild(this.texture);
+        this.texture = undefined;
+    }
+    
+    const newImg = document.createElement('img');
+    newImg.onload = function() {
+        URL.revokeObjectURL(url);
+    };
+    newImg.src = url;
+    this.domElement.appendChild(newImg);
+    this.texture = newImg;
+    // this.free();
+}
 
-
-// function matrix2cssTransform(matrix) {
-//     matrix = matrix.clone();
-//     matrix.multiply(new THREE.Matrix4().makeScale(1, -1, 1));
-
-//     let transform =  'matrix3d(';
-//     for (let i = 0; i < 15; ++i) {
-//         transform += (i % 4 === 0 ? -1 : 1) * matrix.elements[i].toFixed(2) + ', ';
-//     }
-//     transform += matrix.elements[15].toFixed(2) + ')';
-//     return transform;
-// }
+promptPaintTexture() {
+    globals.prompt('draw a stick man');
+    this.freeze();
+    const paint = new Paint(this.texture, this.handleChangeTexture.bind(this));
+    paint.setStyle({
+        left: '' + this.domElement.getBoundingClientRect().left + 'px',
+        top: '' + this.domElement.getBoundingClientRect().top + 'px',
+    });
+    this.domElement.removeChild(this.texture);
+    this.texture = undefined;
+}
+*/
 
 
 // render function, should be called in main
@@ -73,6 +49,8 @@ function animate(timeStamp) {
     globals.deltaTime = timeStamp - globals.time;
     // if (globals.deltaTime < 100) return;
     globals.time = timeStamp;
+
+    updateControl();
     
     // update game objects
     for (const gameObject of gameObjects) {

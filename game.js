@@ -17,6 +17,7 @@ const gameObjects = [];
 // expose global variable for debugging
 window.globals = globals;
 window.gameObjects = gameObjects;
+window.root = root;
 
 
 // global events
@@ -38,8 +39,20 @@ document.body.addEventListener('pointerup', (e) => {
 
 // base class for all game objects
 class GameObject {
-    constructor() {
+    constructor({textureUrl, x=0, y=0}) {
         gameObjects.push(this);
+
+        this.domElement = document.createElement('div');
+        this.domElement.classList.add('gameObject');
+        if (textureUrl) {
+            this.domElement.innerHTML = '<img class="texture" src="' + textureUrl + '" alt=""></img>';
+            this.texture = this.domElement.querySelector('.texture');
+        }
+        root.appendChild(this.domElement);
+
+        this.x = x;
+        this.y = y;
+        this.setPosition(this.x, this.y, 100, -90, 0, 0);
     }
     
     destory() {
@@ -64,6 +77,20 @@ class GameObject {
         if (this.domElement && this.object3d) {
             //
         }
+    }
+    
+    setPosition(x=0, y=0, z=0, rx=0, ry=0, rz=0) {
+        this.setStyle({
+            transform: `translateX(${Math.floor(x)}px) translateY(${Math.floor(y)}px) translateZ(${Math.floor(z)}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`,
+        });
+    }
+    
+    distance(x1, y1, x2, y2) {
+        return (Math.abs(x1 - x2) + Math.abs(y1 - y2));
+    }
+
+    distanceTo(x, y) {
+        return this.distance(this.x, this.y, x, y);
     }
 }
 
