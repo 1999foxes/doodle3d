@@ -3,12 +3,20 @@ import Player from './player.js';
 import Paint from './paint.js';
 import grid from './grid.js';
 import updateControl from './parallaxControl.js';
+import gameObjectSelector from './gameObjectSelector.js';
+import { GameObject } from './gameObject.js';
 
 
-let p = new Player({textureUrl: './player.png', x: 100, y: 200});
+let p = new Player({textureUrl: './player.png', x: 2, y: 2});
 window.p = p;
 
-let paint = new Paint({x: grid.gridX2ClientX(5), y: grid.gridY2ClientY(5)});
+setTimeout(() => {
+let paint = new Paint({gameObject: p});
+window.paint = paint;
+}, 1000);
+
+
+let obj = new GameObject({});
 
 /*
 handleChangeTexture(url) {

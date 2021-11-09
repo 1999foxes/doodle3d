@@ -1,14 +1,19 @@
-import { globals, root, gameObjects, GameObject } from './game.js';
+import { globals, root, gameObjects } from './game.js';
 import grid from './grid.js';
+import {GameObject} from './gameObject.js';
 
 class Player extends GameObject {
-    constructor(props) {
-        super(props);
+    constructor({textureUrl='./player.png', size='size_8', x=0, y=0}) {
+        super({textureUrl, size, x, y});
         // init variables
         this.state = 'free';
         this.isWalking = false;
         this.walkingTargetX = 0;
         this.walkingTargetY = 0;
+        this.clientX = grid.gridX2ClientX(x);
+        this.clientY = grid.gridY2ClientY(y);
+        this.x = undefined;
+        this.y = undefined;
 
         // init dom element
         this.domElement.classList.add('player');
@@ -32,16 +37,16 @@ class Player extends GameObject {
     walkTo(x, y) {
         this.isWalking = true;
 
-        this.walkingStartX = this.x;
-        this.walkingStartY = this.y;
+        this.walkingStartX = this.clientX;
+        this.walkingStartY = this.clientY;
 
         this.walkingTargetX = x;
         this.walkingTargetY = y;
 
         this.walkingDeltaTime = globals.deltaTime;
-        this.walkingEndTime = this.distanceTo(this.walkingTargetX, this.walkingTargetY) / 100 * 500;
+        this.walkingEndTime = this.distance(this.clientX, this.clientY, this.walkingTargetX, this.walkingTargetY) * 5;
 
-        this.texture.classList.add('walking');
+        this.texture.classList.add('animation_walk');
     }
 
     freeze() {
@@ -57,15 +62,15 @@ class Player extends GameObject {
             this.walkingDeltaTime += globals.deltaTime;
             if (this.walkingDeltaTime >= this.walkingEndTime) {
                 this.isWalking = false;
-                this.texture.classList.remove('walking');
-                this.x = this.walkingTargetX;
-                this.y = this.walkingTargetY;
-                this.setPosition(this.x, this.y, 100, -90, 0, 0);
+                this.texture.classList.remove('animation_walk');
+                this.clientX = this.walkingTargetX;
+                this.clientY = this.walkingTargetY;
+                this.setPosition(this.clientX, this.clientY);
             } else {
                 let fraction = this.walkingDeltaTime / this.walkingEndTime;
-                this.x = (1 - fraction) * this.walkingStartX + fraction * this.walkingTargetX;
-                this.y = (1 - fraction) * this.walkingStartY + fraction * this.walkingTargetY;
-                this.setPosition(this.x, this.y, 100, -90, 0, 0);
+                this.clientX = (1 - fraction) * this.walkingStartX + fraction * this.walkingTargetX;
+                this.clientY = (1 - fraction) * this.walkingStartY + fraction * this.walkingTargetY;
+                this.setPosition(this.clientX, this.clientY);
             }
         }
     }

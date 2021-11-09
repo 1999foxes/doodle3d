@@ -1,16 +1,24 @@
-import { globals, root, gameObjects, GameObject } from './game.js';
+import { globals, root, gameObjects } from './game.js';
 
 
 class Grid {
-    constructor(width = 20, height = 20) {
-        this.width = width;
-        this.height = height;
+    constructor(gridWidth = 32, gridHeight = 32, clientWidth = 500, clientHeight = 500) {
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
+        this.clientWidth = clientWidth;
+        this.clientHeight = clientHeight;
 
         this.domElement = document.createElement('table');
         this.domElement.classList.add('grid');
-        for (let i = 0; i < height; ++i) {
+        Object.assign(root.style, {
+            width: this.clientWidth + 'px',
+            height: this.clientHeight + 'px',
+            left: 'calc(50% - ' + (this.clientWidth / 2 | 0) + 'px)',
+            top: 'calc(50% - ' + (this.clientHeight / 2 | 0) + 'px)',
+        });
+        for (let i = 0; i < gridHeight; ++i) {
             const row = document.createElement('tr');
-            for (let j = 0; j < width; ++j) {
+            for (let j = 0; j < gridWidth; ++j) {
                 const cell = document.createElement('td');
                 row.appendChild(cell);
                 cell.onclick = () => {
@@ -20,8 +28,8 @@ class Grid {
                             gridY: i,
                             clientX: this.gridX2ClientX(j),
                             clientY: this.gridY2ClientY(i),
-                            width,
-                            height,
+                            gridWidth,
+                            gridHeight,
                         },
                         bubbles: true,
                         cancelable: true,
@@ -36,11 +44,19 @@ class Grid {
     }
 
     gridX2ClientX(gridX) {
-        return gridX * window.innerWidth / grid.width;
+        return gridX * this.clientWidth / this.gridWidth;
     }
 
     gridY2ClientY(gridY) {
-        return gridY * window.innerHeight / grid.height;
+        return gridY * this.clientHeight / this.gridHeight;
+    }
+
+    clientX2GridX(clientX) {
+        return clientX * this.gridWidth / this.clientWidth;
+    }
+
+    clientY2GridY(clientY) {
+        return clientY * this.gridHeight / this.clientHeight;
     }
 }
 

@@ -1,14 +1,13 @@
-import { globals, root, gameObjects, GameObject } from './game.js';
+import { globals, root, gameObjects, GUI } from './game.js';
+import { GUIObject, animations, sizes } from './gameObject.js';
 
-class Paint extends GameObject {
-    constructor({defaultImg, handleExport, x, y}) {
-        super({x, y});
 
+class Paint extends GUIObject {
+    constructor({gameObject}) {
+        super();
         // init variables
-        this.handleExport = handleExport || this.saveToFile;
+        this.gameObject = gameObject;
         this.isPainting = false;
-        this.width = 32;
-        this.height = 32;
         this.penSize = 1;
         this.strokeBuffer = [];
         this.color = [0, 0, 0, 255];    // rgba black
@@ -17,9 +16,12 @@ class Paint extends GameObject {
         this.domElement.classList.add('paint');
         this.domElement.innerHTML = `
         <div class="control">
-            <button class="resize">
-                <i class="fas fa-expand-alt"></i>
-            </button>
+        <button class="resize">
+            <i class="fas fa-expand-alt"></i>
+        </button>
+        <button class="animation">
+            <i class="fas fa-play"></i>
+        </button>
             <button class="color">
                 <input type="color" class="color" value="#000000"></input>
                 <i class="fas fa-palette"></i>
@@ -30,9 +32,9 @@ class Paint extends GameObject {
             <button class="eraser">
                 <i class="fas fa-eraser"></i>
             </button>
-            <button class="confirm">
-                <i class="fas fa-check"></i>
-            </button>
+            <!-- <button class="confirm">
+                 <i class="fas fa-check"></i>
+            </button>-->
             <button class="cancel">
                 <i class="fas fa-times"></i>
             </button>
@@ -40,20 +42,24 @@ class Paint extends GameObject {
         <canvas />
         `;
         this.resizeButton = this.domElement.querySelector('.resize');
+        this.animationButton = this.domElement.querySelector('.animation');
         this.colorButton = this.domElement.querySelector('.color input');
         this.penButton = this.domElement.querySelector('.pen');
+        this.penButton.style.display = 'none';
         this.eraserButton = this.domElement.querySelector('.eraser');
         this.confirmButton = this.domElement.querySelector('.confirm');
         this.cancelButton = this.domElement.querySelector('.cancel');
         this.canvas = this.domElement.querySelector('canvas');
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
-
-        root.appendChild(this.domElement);
+        this.updateCanvasSize();
+        this.paintImage(this.gameObject.texture);
+        GUI.appendChild(this.domElement);
 
         // bind events
         this.handleResize = this.handleResize.bind(this);
         this.resizeButton.addEventListener('click', this.handleResize);
+
+        this.handleChangeAnimation = this.handleChangeAnimation.bind(this);
+        this.animationButton.addEventListener('click', this.handleChangeAnimation);
 
         this.handleChangeColor = this.handleChangeColor.bind(this);
         this.colorButton.addEventListener('change', this.handleChangeColor);
@@ -64,9 +70,6 @@ class Paint extends GameObject {
         this.handleChangeEraser = this.handleChangeEraser.bind(this);
         this.eraserButton.addEventListener('click', this.handleChangeEraser);
 
-        this.handleConfirm = this.handleConfirm.bind(this);
-        this.confirmButton.addEventListener('click', this.handleConfirm);
-
         this.handleCancel = this.handleCancel.bind(this);
         this.cancelButton.addEventListener('click', this.handleCancel);
 
@@ -75,19 +78,29 @@ class Paint extends GameObject {
         this.canvas.addEventListener('pointermove', this.handlePaint);
         this.canvas.addEventListener('pointerup', this.handlePaint);
         this.canvas.addEventListener('pointerout', this.handlePaint);
-
-        // paint default image
-        if (defaultImg !== undefined) {
-            this.paintDefaultImage(defaultImg);
-        }
     }
 
-    paintDefaultImage(img) {
+    paintImage(img) {
         this.canvas.getContext('2d').drawImage(img, 0, 0);
     }
 
+    updateCanvasSize() {
+        const canvasSize = this.gameObject.getGridSize() * 4;
+        this.canvas.width = canvasSize;
+        this.canvas.height = canvasSize;
+    }
+
     handleResize() {
-        console.log('handleResize');
+        const nextIndex = (sizes.indexOf(this.gameObject.size) + 1) % sizes.length
+        const next = sizes[nextIndex];
+        this.gameObject.setSize(next);
+        this.updateCanvasSize();
+        this.syncTexture();
+    }
+
+    handleChangeAnimation() {
+        const next = animations[(animations.indexOf(this.gameObject.animation) + 1) % animations.length];
+        this.gameObject.setAnimation(next);
     }
 
     handleChangeColor(e) {
@@ -96,22 +109,14 @@ class Paint extends GameObject {
 
     handleChangePen() {
         this.color = hexToRgba(this.colorButton.value);
+        this.penButton.style.display = 'none';
+        this.eraserButton.style.display = '';
     }
 
     handleChangeEraser() {
         this.color = [0, 0, 0, 0];
-    }
-
-    handleConfirm() {
-        if (this.handleExport === undefined) {
-            this.destory();
-        } else {
-            this.canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                this.handleExport(url);
-                this.destory();
-            });
-        }
+        this.penButton.style.display = '';
+        this.eraserButton.style.display = 'none';
     }
 
     saveToFile(url) {
@@ -122,7 +127,7 @@ class Paint extends GameObject {
     }
 
     handleCancel() {
-        this.destory();
+        this.destroy();
     }
 
     handlePaint(e) {
@@ -130,6 +135,7 @@ class Paint extends GameObject {
             this.isPainting = true;
         } else if (e.type === 'pointerup' || e.type === 'pointerout') {
             this.isPainting = false;
+            this.strokeBuffer.length = 0;
             // upload painted stroke if running online
         }
 
@@ -144,8 +150,8 @@ class Paint extends GameObject {
     getPixelCoords(clientX, clientY) {
         const { left, top, width, height } = this.canvas.getBoundingClientRect();
         return [
-            Math.floor((clientX - left) / width * this.width),
-            Math.floor((clientY - top) / height * this.height),
+            Math.floor((clientX - left) / width * this.canvas.width),
+            Math.floor((clientY - top) / height * this.canvas.height),
         ]
     }
 
@@ -169,9 +175,17 @@ class Paint extends GameObject {
         this.strokeBuffer.push(lastPoint);
     }
 
+    syncTexture() {
+        this.canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            this.gameObject.setTextureUrl(url);
+        });
+    }
+
     update() {
         if (this.isPainting) {
             this.paintStroke();
+            this.syncTexture();
         }
     }
 }

@@ -1,7 +1,7 @@
-import { globals, root, gameObjects, GameObject } from './game.js';
+import { globals, root, gameObjects } from './game.js';
 
 
-const limitX = 100, limitY = 50;
+const limitX = 20, limitY = 10;
 let lastPointerX = 0, lastPointerY = 0;
 
 function update() {
