@@ -1,7 +1,7 @@
 import { globals, root, gameObjects } from './game.js';
 
 
-const limitX = 20, limitY = 10;
+const limitX = 3, limitY = 10;
 let lastPointerX = 0, lastPointerY = 0;
 
 function update() {
@@ -9,9 +9,9 @@ function update() {
         return;
     }
     Object.assign(root.style, {
-        transform: `translateX(${-globals.pointerX / window.innerWidth * limitX}px) `+
-            `translateY(${-globals.pointerY / window.innerHeight * limitY}px)  `+
-            `rotateX(60deg)`,
+        transform: 
+            `rotateY(${-globals.pointerX / window.innerWidth * limitX + limitX / 2}deg)  `+
+            `rotateX(${globals.pointerY / window.innerHeight * limitY + 50}deg)`,
     });
     lastPointerX = globals.pointerX;
     lastPointerY = globals.pointerY;

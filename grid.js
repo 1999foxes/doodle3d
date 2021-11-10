@@ -1,8 +1,8 @@
 import { globals, root, gameObjects } from './game.js';
 
 
-class Grid {
-    constructor(gridWidth = 32, gridHeight = 32, clientWidth = 500, clientHeight = 500) {
+class Grid {    // singleton
+    constructor(gridWidth = 32, gridHeight = 32, clientWidth = 64, clientHeight = 64) {
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
         this.clientWidth = clientWidth;
@@ -11,10 +11,10 @@ class Grid {
         this.domElement = document.createElement('table');
         this.domElement.classList.add('grid');
         Object.assign(root.style, {
-            width: this.clientWidth + 'px',
-            height: this.clientHeight + 'px',
-            left: 'calc(50% - ' + (this.clientWidth / 2 | 0) + 'px)',
-            top: 'calc(50% - ' + (this.clientHeight / 2 | 0) + 'px)',
+            width: this.clientWidth + 'vh',
+            height: this.clientHeight + 'vh',
+            left: 'calc(50% - ' + (this.clientWidth / 2 | 0) + 'vh)',
+            top: 'calc(50% - ' + (this.clientHeight / 2 | 0) + 'vh)',
         });
         for (let i = 0; i < gridHeight; ++i) {
             const row = document.createElement('tr');
@@ -60,6 +60,6 @@ class Grid {
     }
 }
 
-const grid = new Grid();    // singleton
+const grid = new Grid();
 
 export default grid;

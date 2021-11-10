@@ -1,4 +1,4 @@
-import { globals, root, gameObjects } from './game.js';
+import { globals, root, GUI, gameObjects } from './game.js';
 import Paint from './paint.js';
 import { GameObject } from './gameObject.js';
 
@@ -18,14 +18,15 @@ class GameObjectSelector {      // singleton
 
         this.addGameObjectButton = document.createElement('button');
         this.addGameObjectButton.classList.add('addGameObjectButton');
+        this.addGameObjectButton.innerHTML = '<i class="fas fa-plus"></i>';
         this.domElement.appendChild(this.addGameObjectButton);
 
-        document.body.appendChild(this.domElement);
+        GUI.appendChild(this.domElement);
 
         this.handleGridClick = this.handleGridClick.bind(this);
         root.addEventListener('gridclick', this.handleGridClick);
 
-        this.handlePaintInit = this.handleGridClick.bind(this);
+        this.handlePaintInit = this.handlePaintInit.bind(this);
 
         this.handleAddGameObject = this.handleAddGameObject.bind(this);
         this.addGameObjectButton.onclick = this.handleAddGameObject;
@@ -38,7 +39,6 @@ class GameObjectSelector {      // singleton
     }
 
     selectGameObject(x, y) {
-        console.log(x, y, gameObjects);
         const result = [];
         for (const go of gameObjects) {
             if (go.x === x && go.y === y) {
@@ -50,9 +50,19 @@ class GameObjectSelector {      // singleton
 
     handlePaintInit(gameObject) {
         if (this.paint !== undefined) {
-            this.paint.destroy()
+            this.paint.destroy();
+            this.paint = undefined;
         }
-        this.paint = new Paint({gameObject});
+        this.paint = new Paint({gameObject, 
+            handleQuit: () => {
+                this.paint = undefined;
+                this.update();
+            },
+            handleDelete: () => { 
+                gameObject.destroy();
+                this.update();
+            },
+        });
     }
 
     handleAddGameObject() {
@@ -66,15 +76,13 @@ class GameObjectSelector {      // singleton
             return;
         }
         this.selected = this.selectGameObject(this.x, this.y);
-        this.domElement.innerHTML = '';
+        this.previews.innerHTML = '';
         for (const go of this.selected) {
-            console.log(go);
-            const preview = document.createElement('div');
-            preview.innerHTML = `
-                <img class='preview'></img>
-            `;
+            const preview = document.createElement('img');
+            preview.src = go.texture.src;
+            preview.classList.add('preview');
             preview.onclick = () => this.handlePaintInit(go);
-            this.domElement.appendChild(preview);
+            this.previews.appendChild(preview);
         }
     }
 }

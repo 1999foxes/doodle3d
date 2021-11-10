@@ -3,7 +3,7 @@ import { GUIObject, animations, sizes } from './gameObject.js';
 
 
 class Paint extends GUIObject {
-    constructor({gameObject}) {
+    constructor({gameObject, handleQuit}) {
         super();
         // init variables
         this.gameObject = gameObject;
@@ -35,7 +35,10 @@ class Paint extends GUIObject {
             <!-- <button class="confirm">
                  <i class="fas fa-check"></i>
             </button>-->
-            <button class="cancel">
+            <button class="delete">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+            <button class="quit">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -48,7 +51,8 @@ class Paint extends GUIObject {
         this.penButton.style.display = 'none';
         this.eraserButton = this.domElement.querySelector('.eraser');
         this.confirmButton = this.domElement.querySelector('.confirm');
-        this.cancelButton = this.domElement.querySelector('.cancel');
+        this.deleteButton = this.domElement.querySelector('.delete');
+        this.quitButton = this.domElement.querySelector('.quit');
         this.canvas = this.domElement.querySelector('canvas');
         this.updateCanvasSize();
         this.paintImage(this.gameObject.texture);
@@ -70,8 +74,18 @@ class Paint extends GUIObject {
         this.handleChangeEraser = this.handleChangeEraser.bind(this);
         this.eraserButton.addEventListener('click', this.handleChangeEraser);
 
-        this.handleCancel = this.handleCancel.bind(this);
-        this.cancelButton.addEventListener('click', this.handleCancel);
+        if (handleQuit) {
+            this.handleQuit = () => {
+                handleQuit();
+                this.destroy();
+            }
+        } else {
+            this.handleQuit = this.handleQuit.bind(this);
+        }
+        this.quitButton.addEventListener('click', this.handleQuit);
+
+        this.handleDelete = this.handleDelete.bind(this);
+        this.deleteButton.addEventListener('click', this.handleDelete);
 
         this.handlePaint = this.handlePaint.bind(this);
         this.canvas.addEventListener('pointerdown', this.handlePaint);
@@ -126,8 +140,13 @@ class Paint extends GUIObject {
         link.click();
     }
 
-    handleCancel() {
+    handleQuit() {
         this.destroy();
+    }
+
+    handleDelete() {
+        this.gameObject.destroy();
+        this.handleQuit();
     }
 
     handlePaint(e) {
@@ -203,5 +222,6 @@ function hexToRgba(hex) {
         255
     ] : [0, 0, 0, 0];
 }
+
 
 export default Paint;

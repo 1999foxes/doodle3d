@@ -7,53 +7,59 @@ import gameObjectSelector from './gameObjectSelector.js';
 import { GameObject } from './gameObject.js';
 
 
-let p = new Player({textureUrl: './player.png', x: 2, y: 2});
-window.p = p;
+let player = new Player({textureUrl: './player.png', x: 2, y: 2});
+window.player = player;
 
-setTimeout(() => {
-let paint = new Paint({gameObject: p});
-window.paint = paint;
-}, 1000);
+const editButton = document.getElementById('edit');
+editButton.onclick = toggleEditMode;
 
-
-let obj = new GameObject({});
-
-/*
-handleChangeTexture(url) {
-    if (this.texture !== undefined) {
-        this.domElement.removeChild(this.texture);
-        this.texture = undefined;
+globals.isEditMode = false;
+hide(gameObjectSelector.domElement);
+function toggleEditMode() {
+    if (!globals.isEditMode) {
+        for (const td of grid.domElement.querySelectorAll('td')) {
+            td.classList.add('editable');
+        }
+        for (const go of gameObjects) {
+            go.domElement.classList.add('editable');
+        }
+        show(gameObjectSelector.domElement);
+        player.freeze();
+        globals.isEditMode = true;
+    } else {
+        for (const td of grid.domElement.querySelectorAll('td')) {
+            td.classList.remove('editable');
+        }
+        for (const go of gameObjects) {
+            go.domElement.classList.remove('editable');
+        }
+        hide(gameObjectSelector.domElement);
+        player.free();
+        globals.isEditMode = false;
     }
-    
-    const newImg = document.createElement('img');
-    newImg.onload = function() {
-        URL.revokeObjectURL(url);
-    };
-    newImg.src = url;
-    this.domElement.appendChild(newImg);
-    this.texture = newImg;
-    // this.free();
 }
 
-promptPaintTexture() {
-    globals.prompt('draw a stick man');
-    this.freeze();
-    const paint = new Paint(this.texture, this.handleChangeTexture.bind(this));
-    paint.setStyle({
-        left: '' + this.domElement.getBoundingClientRect().left + 'px',
-        top: '' + this.domElement.getBoundingClientRect().top + 'px',
-    });
-    this.domElement.removeChild(this.texture);
-    this.texture = undefined;
-}
-*/
 
+const themeButton = document.getElementById('theme');
+themeButton.onclick = editTheme;
+function editTheme() {
+    console.log(123);
+    new Paint({gameObject: player});
+}
+
+
+
+function hide(domElement) {
+    Object.assign(domElement.style, { display: 'none' });
+}
+function show(domElement) {
+    Object.assign(domElement.style, { display: '' });
+}
 
 // render function, should be called in main
 function animate(timeStamp) {
     requestAnimationFrame(animate);
-
-    // // update global variables
+    
     globals.deltaTime = timeStamp - globals.time;
     // if (globals.deltaTime < 100) return;
     globals.time = timeStamp;
@@ -64,16 +70,6 @@ function animate(timeStamp) {
     for (const gameObject of gameObjects) {
         gameObject.update();
     }
-    
-    // // control
-    // cube.rotation.z += 0.01;
-    // cube.rotation.y += 0.01;
-    // p.setStyle({
-    //     transform: matrix2cssTransform(cube.matrixWorld),
-    // });
-
-    // // render
-    // renderer.render(scene, camera);
 }
 
 animate();
