@@ -43,7 +43,6 @@ function toggleEditMode() {
 const themeButton = document.getElementById('theme');
 themeButton.onclick = editTheme;
 function editTheme() {
-    console.log(123);
     new Paint({gameObject: player});
 }
 

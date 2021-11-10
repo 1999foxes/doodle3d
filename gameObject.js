@@ -76,7 +76,7 @@ class GameObject {
 
     setTransform(x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0) {
         this.setStyle({
-            transform: `translateX(${Math.floor(x)}vh) translateY(${Math.floor(y)}vh) translateZ(${Math.floor(z)}vh) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`,
+            transform: `translateX(${x.toFixed(2)}vh) translateY(${y.toFixed(2)}vh) translateZ(${z.toFixed(2)}vh) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`,
         });
     }
 

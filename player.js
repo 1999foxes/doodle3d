@@ -44,7 +44,7 @@ class Player extends GameObject {
         this.walkingTargetY = y;
 
         this.walkingDeltaTime = globals.deltaTime;
-        this.walkingEndTime = this.distance(this.clientX, this.clientY, this.walkingTargetX, this.walkingTargetY) * 5;
+        this.walkingEndTime = this.distance(this.clientX, this.clientY, this.walkingTargetX, this.walkingTargetY) * 40;
 
         this.texture.classList.add('animation_walk');
     }
